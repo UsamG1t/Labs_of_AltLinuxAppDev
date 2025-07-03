@@ -22,26 +22,22 @@
 Регистрация выполняется с помощью команды `hasher-useradd`:
 
 ```console
-[root@VM ~]# id admin    
-uid=1000(admin) gid=1000(admin) группы=1000(admin),10(wheel),100(users),36(v  
-musers)  
+[root@VM ~]# id user    
+uid=1000(user) gid=1000(user) группы=1000(user),10(wheel),100(users),36(vmusers)  
 
-[root@VM ~]# hasher-useradd admin  
+[root@VM ~]# hasher-useradd user  
 useradd: Warning: missing or non-executable shell '/dev/null'  
 useradd: Warning: missing or non-executable shell '/dev/null'  
-Добавление пользователя admin в группу admin_a  
-Добавление пользователя admin в группу admin_b  
-Добавление пользователя admin в группу hashman  
+Добавление пользователя user в группу user_a  
+Добавление пользователя user в группу user_b  
+Добавление пользователя user в группу hashman  
 hasher-useradd: enabling hasher-privd  
 Внимание: Отправляется запрос 'systemctl enable hasher-privd.service'.  
-Synchronizing state of hasher-privd.service with SysV service script with /usr/lib/systemd/systemd-sysv  
--install.  
-Executing: /usr/lib/systemd/systemd-sysv-install enable hasher-privd  
-hasher-useradd: starting hasher-privd  
+Synchronizing state of hasher-privd.service with SysV service script with /usr/lib/systemd/systemd-sysv-install.  
+Executing: /usr/lib/systemd/systemd-sysv-install enable hasher-privd hasher-useradd: starting hasher-privd  
 
-[root@VM ~]# id admin  
-uid=1000(admin) gid=1000(admin) группы=1000(admin),10(wheel),100(users),997(  
-hashman),1001(admin_a),1002(admin_b),36(vmusers)  
+[root@VM ~]# id user  
+uid=1000(user) gid=1000(user) группы=1000(user),10(wheel),100(users),997(hashman),1001(user_a),1002(user_b),36(vmusers)  
 [root@VM ~]#
 ```
 
@@ -54,10 +50,10 @@ hashman),1001(admin_a),1002(admin_b),36(vmusers)
 Перед каждой сборкой нового пакета необходимо пересоздавать окружение, сделать это можно с помощью ключа `--init`. Также окружение автоматически пересоздаётся при открытии архива исходников пакета (`.src.rpm`-файлы). При первом создании окружения необходимо отдельно создать директорию для расположения изолированного блока файловой системы. По умолчанию инструмент ожидает директорию `./hasher/`,  однако она может быть любой, в таком случае необходимо одним из параметров передавать путь к расположению директории:
 
 ```console
-[admin@VM ~]$ hsh --init  
-/usr/bin/hsh-sh-functions: строка 281: cd: /home/admin/hasher: Нет такого файла или каталога  
-[admin@VM ~]$ mkdir hasher  
-[admin@VM ~]$ hsh -v --init |& tee log
+[user@VM ~]$ hsh --init  
+/usr/bin/hsh-sh-functions: строка 281: cd: /home/user/hasher: Нет такого файла или каталога  
+[user@VM ~]$ mkdir hasher  
+[user@VM ~]$ hsh -v --init |& tee log
 ```
 
 Рассмотрим [вывод](https://github.com/UsamG1t/Labs_of_AltLinuxAppDev/blob/master/00_BuildEnv/Attached_materials/%D0%A1%D0%BE%D0%BA%D1%80%D0%B0%D1%89%D1%91%D0%BD%D0%BD%D1%8B%D0%B9%20%D0%B2%D1%8B%D0%B2%D0%BE%D0%B4%20%D0%BF%D1%80%D0%B8%20%D1%81%D0%BE%D0%B7%D0%B4%D0%B0%D0%BD%D0%B8%D0%B8%20%D0%BE%D0%BA%D1%80%D1%83%D0%B6%D0%B5%D0%BD%D0%B8%D1%8F%20hasher.md) при создании окружения и обсудим некоторые составные части `hasher`. \
@@ -69,11 +65,11 @@ hashman),1001(admin_a),1002(admin_b),36(vmusers)
  + `hsh-install` для установки пакетов из репозиториев Альт
 
 ```console
-[admin@VM ~]$ hsh --init  
+[user@VM ~]$ hsh --init  
 <...>  
-[admin@VM ~]$ hsh-install vim-console tree  
+[user@VM ~]$ hsh-install vim-console tree  
 <...>  
-[admin@VM ~]$
+[user@VM ~]$
 ```
 
 Также будут опускаться команды входа в изолированное окружение от имени `builder` и `rooter`, все кодовые вставки будут сопровождаться отметками о том, от имени какого пользователя проведён вход:
@@ -189,10 +185,10 @@ RPM
 
 Попробуем установить полученный пакет в `hasher`, для этого необходимо от имени суперпользователя воспользоваться установщиком `rpm` с ключом `-i`. Чтобы у `rooter` была возможность обратиться к полученному пакету, необходимо перенести его в директорию общего доступа для всех трёх пользователей - специальную директорию `.in`:
 
-`admin`
+`user`
 ```console
-[admin@VM ~]$ cp hasher/chroot/usr/src/RPM/RPMS/x86_64/null-pkg-1.0-alt1.x86_64.rpm hasher/chroot/.in/  
-[admin@VM ~]$ hsh-shell --rooter  
+[user@VM ~]$ cp hasher/chroot/usr/src/RPM/RPMS/x86_64/null-pkg-1.0-alt1.x86_64.rpm hasher/chroot/.in/  
+[user@VM ~]$ hsh-shell --rooter  
 ```
 
 `rooter`
@@ -260,7 +256,7 @@ install -D -pm 755 %_sourcedir/%name-%version.sh %{buildroot}%{_bindir}/%name
 
 Разберём новые директивы и команды.
 
-	Директива `Source` в преамбуле описывает набор исходных текстов программы. Напомним, что по правилам сборки `RPM` исходники необходимо размещать в виде `.tar.gz`-архива, мы же для упрощения укажем исключительно один скрипт. Именование архива в обязательном порядке должно содержать имя и версию пакета через дефис, аналогично именованию нашего файла.
+Директива `Source` в преамбуле описывает набор исходных текстов программы. Напомним, что по правилам сборки `RPM` исходники необходимо размещать в виде `.tar.gz`-архива, мы же для упрощения укажем исключительно один скрипт. Именование архива в обязательном порядке должно содержать имя и версию пакета через дефис, аналогично именованию нашего файла.
 
 В основной части добавилась директива `%install`, которая отвечает за команды установки/копирования файлов из сборочного каталога в псевдо-корневой каталог. Утилита `install` занимается размещением итоговых файлов (исполняемых файлов, документации, библиотек; в нашем случае, исполняемого скрипта) по их конечным директориям. При этом используются [предопределённые макросы](https://www.altlinux.org/Spec/%D0%9F%D1%80%D0%B5%D0%B4%D0%BE%D0%BF%D1%80%D0%B5%D0%B4%D0%B5%D0%BB%D0%B5%D0%BD%D0%BD%D1%8B%D0%B5_%D0%BC%D0%B0%D0%BA%D1%80%D0%BE%D1%81%D1%8B#C%D0%BF%D0%B8%D1%81%D0%BE%D0%BA_%D0%BC%D0%B0%D0%BA%D1%80%D0%BE%D1%81%D0%BE%D0%B2), описывающие место установки данных. Для исплняемого скрипта, изначально размещавшегося в `RPM/SOURCE`, производится установка в псевдокорневой каталог (внутри `RPM/BUILD`) в директорию `/usr/bin`
 
@@ -282,12 +278,10 @@ Executing(%install): /bin/sh -e /usr/src/tmp/rpm-tmp.81856
 + /usr/lib/rpm/brp-alt  
 
 Cleaning files in /usr/src/tmp/not-null-pkg-buildroot (auto)  
-Verifying and fixing files in /usr/src/tmp/not-null-pkg-buildroot (binconfig,pkgconfig,libtool,desktop,  
-gnuconfig)  
+Verifying and fixing files in /usr/src/tmp/not-null-pkg-buildroot (binconfig,pkgconfig,libtool,desktop,gnuconfig)  
 Checking contents of files in /usr/src/tmp/not-null-pkg-buildroot/ (default)  
 Compressing files in /usr/src/tmp/not-null-pkg-buildroot (auto)  
-Verifying ELF objects in /usr/src/tmp/not-null-pkg-buildroot (arch=normal,fhs=normal,lfs=relaxed,lint=r  
-elaxed,rpath=normal,stack=normal,textrel=normal,unresolved=normal)  
+Verifying ELF objects in /usr/src/tmp/not-null-pkg-buildroot (arch=normal,fhs=normal,lfs=relaxed,lint=relaxed,rpath=normal,stack=normal,textrel=normal,unresolved=normal)  
 Splitting links to aliased files under /{,s}bin in /usr/src/tmp/not-null-pkg-buildroot  
 Processing files: not-null-pkg-1.0-alt1  
 Finding Provides (using /usr/lib/rpm/find-provides)  
@@ -323,10 +317,10 @@ RPM/
 
 При установке пакета в систему он устанавливается согласно указанным директориям, благодаря чему встроенная в терминал система поиска утилит определяет его:
 
-`admin`
+`user`
 ```console
-[admin@VM ~]$ cp hasher/chroot/usr/src/RPM/RPMS/x86_64/not-null-pkg-1.0-alt1.x86_64.rpm hasher/chroot/.in/  
-[admin@VM ~]$ hsh-shell --rooter  
+[user@VM ~]$ cp hasher/chroot/usr/src/RPM/RPMS/x86_64/not-null-pkg-1.0-alt1.x86_64.rpm hasher/chroot/.in/  
+[user@VM ~]$ hsh-shell --rooter  
 ```
 
 `rooter`
