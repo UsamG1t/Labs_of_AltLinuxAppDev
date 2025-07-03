@@ -22,23 +22,22 @@
 Регистрация выполняется суперпользователем с помощью команды `hasher-useradd`:
 
 ```console
-[root@VM ~]# id admin
-uid=1000(admin) gid=1000(admin) группы=1000(admin),10(wheel),100(users),36(vmusers)
+[root@VM ~]# id user    
+uid=1000(user) gid=1000(user) группы=1000(user),10(wheel),100(users),36(vmusers)  
 
-[root@VM ~]# hasher-useradd admin
-useradd: Warning: missing or non-executable shell '/dev/null'
-useradd: Warning: missing or non-executable shell '/dev/null'
-Добавление пользователя admin в группу admin_a
-Добавление пользователя admin в группу admin_b
-Добавление пользователя admin в группу hashman
-hasher-useradd: enabling hasher-privd
-Внимание: Отправляется запрос 'systemctl enable hasher-privd.service'.
-Synchronizing state of hasher-privd.service with SysV service script with /usr/lib/systemd/systemd-sysv-install.
-Executing: /usr/lib/systemd/systemd-sysv-install enable hasher-privd
-hasher-useradd: starting hasher-privd
+[root@VM ~]# hasher-useradd user  
+useradd: Warning: missing or non-executable shell '/dev/null'  
+useradd: Warning: missing or non-executable shell '/dev/null'  
+Добавление пользователя user в группу user_a  
+Добавление пользователя user в группу user_b  
+Добавление пользователя user в группу hashman  
+hasher-useradd: enabling hasher-privd  
+Внимание: Отправляется запрос 'systemctl enable hasher-privd.service'.  
+Synchronizing state of hasher-privd.service with SysV service script with /usr/lib/systemd/systemd-sysv-install.  
+Executing: /usr/lib/systemd/systemd-sysv-install enable hasher-privd hasher-useradd: starting hasher-privd  
 
-[root@VM ~]# id admin
-uid=1000(admin) gid=1000(admin) группы=1000(admin),10(wheel),100(users),997( hashman),1001(admin_a),1002(admin_b),36(vmusers)
+[root@VM ~]# id user  
+uid=1000(user) gid=1000(user) группы=1000(user),10(wheel),100(users),997(hashman),1001(user_a),1002(user_b),36(vmusers)  
 [root@VM ~]#
 ```
 
@@ -51,10 +50,10 @@ uid=1000(admin) gid=1000(admin) группы=1000(admin),10(wheel),100(users),99
 Перед каждой сборкой нового пакета необходимо пересоздавать окружение, сделать это можно с помощью ключа `--init`. Также окружение автоматически пересоздаётся при открытии архива исходников пакета (`.src.rpm`-файлы). При первом создании окружения необходимо отдельно создать директорию для расположения изолированного блока файловой системы. По умолчанию инструмент ожидает директорию `./hasher/`, однако она может быть любой из разрешённых в файле `/etc/hasher-priv/system` (ключ `prefix=`), в таком случае необходимо одним из параметров передавать путь к расположению директории:
 
 ```console
-[admin@VM ~]$ hsh --init
-/usr/bin/hsh-sh-functions: строка 281: cd: /home/admin/hasher: Нет такого файла или каталога
-[admin@VM ~]$ mkdir hasher
-[admin@VM ~]$ hsh -v --init |& tee log
+[user@VM ~]$ hsh --init  
+/usr/bin/hsh-sh-functions: строка 281: cd: /home/user/hasher: Нет такого файла или каталога  
+[user@VM ~]$ mkdir hasher  
+[user@VM ~]$ hsh -v --init |& tee log
 ```
 
 Рассмотрим [вывод](Attached_materials/%D0%A1%D0%BE%D0%BA%D1%80%D0%B0%D1%89%D1%91%D0%BD%D0%BD%D1%8B%D0%B9%20%D0%B2%D1%8B%D0%B2%D0%BE%D0%B4%20%D0%BF%D1%80%D0%B8%20%D1%81%D0%BE%D0%B7%D0%B4%D0%B0%D0%BD%D0%B8%D0%B8%20%D0%BE%D0%BA%D1%80%D1%83%D0%B6%D0%B5%D0%BD%D0%B8%D1%8F%20hasher.md) при создании окружения и обсудим некоторые составные части `hasher`.
@@ -68,11 +67,11 @@ uid=1000(admin) gid=1000(admin) группы=1000(admin),10(wheel),100(users),99
  + `hsh-install` для установки пакетов из репозиториев Альт
 
 ```console
-[admin@VM ~]$ hsh --init
-<...>
-[admin@VM ~]$ hsh-install vim-console tree
-<...>
-[admin@VM ~]$
+[user@VM ~]$ hsh --init  
+<...>  
+[user@VM ~]$ hsh-install vim-console tree  
+<...>  
+[user@VM ~]$
 ```
 
 Также будут опускаться команды входа в изолированное окружение от имени `builder` и `rooter`, все кодовые вставки будут сопровождаться отметками о том, от имени какого пользователя проведён вход:
@@ -84,7 +83,7 @@ uid=1000(admin) gid=1000(admin) группы=1000(admin),10(wheel),100(users),99
 Разберём структуру `hasher` согласно правилам разработки [`RPM`](https://docs.altlinux.org/ru-RU/alt-platform/10.1/html-single/alt-platform/index.html#id864)-пакетов. `RPM`-пакет состоит из архива файлов, а также заголовка, содержащего метаданные о пакете.
 Различают **пакеты с исходным кодом** (`.src.rpm`), состоящих из исходников и [`spec`-файла](https://docs.altlinux.org/ru-RU/alt-platform/10.1/html-single/alt-platform/index.html#id868), представляющего из себя инструкцию по сборке пакета, и **двоичные пакеты** (`.rpm`), непосредственно устанавливающиеся в систему.
 
-`Hasher` для работы содержит специальноедерево директорий, по которому автоматически или вручную распределяются файлы для сборки:
+`Hasher` для работы содержит специальное дерево директорий, по которому автоматически или вручную распределяются файлы для сборки:
 
 `builder`
 ```console
@@ -188,10 +187,10 @@ RPM
 
 Попробуем установить полученный пакет в `hasher`, для этого необходимо от имени суперпользователя воспользоваться установщиком `rpm` с ключом `-i`. Чтобы у `rooter` была возможность обратиться к полученному пакету, необходимо перенести его в директорию общего доступа для всех трёх пользователей - специальную директорию `.in`:
 
-`admin`
+`user`
 ```console
-[admin@VM ~]$ cp hasher/chroot/usr/src/RPM/RPMS/x86_64/null-pkg-1.0-alt1.x86_64.rpm hasher/chroot/.in/
-[admin@VM ~]$ hsh-shell --rooter
+[user@VM ~]$ cp hasher/chroot/usr/src/RPM/RPMS/x86_64/null-pkg-1.0-alt1.x86_64.rpm hasher/chroot/.in/  
+[user@VM ~]$ hsh-shell --rooter  
 ```
 
 `rooter`
@@ -223,37 +222,32 @@ RPM
 |-- SPECS
 `-- SRPMS
 
-7 directories, 0 files
-[builder@localhost ~]$ vim RPM/SOURCES/not-null-pkg-1.0.sh
-[builder@localhost ~]$ cat RPM/SOURCES/not-null-pkg-1.0.sh  
-echo "This is not null pkg"
-
-[builder@localhost ~]$ vim RPM/SPECS/not-null-pkg.spec
-[builder@localhost ~]$ cat RPM/SPECS/not-null-pkg.spec  
-Name: not-null-pkg
-Version: 1.0
-Release: alt1
-
-Summary: Not Null package
-
-License: GPLv3+
-Group: Development/Other
-Packager: Automated package hasher <hasher@localhost>
-
-Source: %name-%version.sh
-
-%description
-This is not the smallest ever alt package cause of functionality
-
-%install
-install -D -pm 755 %_sourcedir/%name-%version.sh %{buildroot}%{_bindir}
-
-%files
-%_bindir/*
-
-%changelog
-* Tue Jul 01 2025 Automated package hasher <hasher@localhost> 1.0-alt1
-- Initial build
+[builder@localhost ~]$ vim RPM/SPECS/not-null-pkg.spec  
+[builder@localhost ~]$ cat RPM/SPECS/not-null-pkg.spec    
+Name: not-null-pkg  
+Version: 1.0  
+Release: alt1  
+  
+Summary: Not Null package  
+  
+License: GPLv3+  
+Group: Development/Other  
+Packager: Automated package hasher <hasher@localhost>  
+  
+Source: %name-%version.sh  
+  
+%description  
+This is not the smallest ever alt package cause of functionality  
+  
+%install  
+install -D -pm 755 %_sourcedir/%name-%version.sh %{buildroot}%{_bindir}/%name  
+  
+%files  
+%_bindir/*  
+  
+%changelog  
+* Tue Jul 01 2025 Automated package hasher <hasher@localhost> 1.0-alt1  
+- Initial build  
 [builder@localhost ~]$
 ```
 
@@ -280,24 +274,22 @@ Executing(%install): /bin/sh -e /usr/src/tmp/rpm-tmp.81856
 + install -D -pm 755 /usr/src/RPM/SOURCES/not-null-pkg-1.0.sh /usr/src/tmp/not-null-pkg-buildroot/usr/bin/not-null-pkg
 + /usr/lib/rpm/brp-alt
 
-Cleaning files in /usr/src/tmp/not-null-pkg-buildroot (auto)
-Verifying and fixing files in /usr/src/tmp/not-null-pkg-buildroot (binconfig,pkgconfig,libtool,desktop,
-gnuconfig)
-Checking contents of files in /usr/src/tmp/not-null-pkg-buildroot/ (default)
-Compressing files in /usr/src/tmp/not-null-pkg-buildroot (auto)
-Verifying ELF objects in /usr/src/tmp/not-null-pkg-buildroot (arch=normal,fhs=normal,lfs=relaxed,lint=r
-elaxed,rpath=normal,stack=normal,textrel=normal,unresolved=normal)
-Splitting links to aliased files under /{,s}bin in /usr/src/tmp/not-null-pkg-buildroot
-Processing files: not-null-pkg-1.0-alt1
-Finding Provides (using /usr/lib/rpm/find-provides)
-Executing: /bin/sh -e /usr/src/tmp/rpm-tmp.QrK1pE
-find-provides: running scripts (alternatives,debuginfo,lib,pam,perl,pkgconfig,python,python3,shell)
-Finding Requires (using /usr/lib/rpm/find-requires)
-Executing: /bin/sh -e /usr/src/tmp/rpm-tmp.aiR5Fd
-find-requires: running scripts (cpp,debuginfo,files,lib,pam,perl,pkgconfig,pkgconfiglib,python,python3,
-rpmlib,shebang,shell,static,symlinks,systemd-services)
-Finding debuginfo files (using /usr/lib/rpm/find-debuginfo-files)
-Executing: /bin/sh -e /usr/src/tmp/rpm-tmp.CsoTgW
+Cleaning files in /usr/src/tmp/not-null-pkg-buildroot (auto)  
+Verifying and fixing files in /usr/src/tmp/not-null-pkg-buildroot (binconfig,pkgconfig,libtool,desktop,gnuconfig)  
+Checking contents of files in /usr/src/tmp/not-null-pkg-buildroot/ (default)  
+Compressing files in /usr/src/tmp/not-null-pkg-buildroot (auto)  
+Verifying ELF objects in /usr/src/tmp/not-null-pkg-buildroot (arch=normal,fhs=normal,lfs=relaxed,lint=relaxed,rpath=normal,stack=normal,textrel=normal,unresolved=normal)  
+Splitting links to aliased files under /{,s}bin in /usr/src/tmp/not-null-pkg-buildroot  
+Processing files: not-null-pkg-1.0-alt1  
+Finding Provides (using /usr/lib/rpm/find-provides)  
+Executing: /bin/sh -e /usr/src/tmp/rpm-tmp.QrK1pE  
+find-provides: running scripts (alternatives,debuginfo,lib,pam,perl,pkgconfig,python,python3,shell)  
+Finding Requires (using /usr/lib/rpm/find-requires)  
+Executing: /bin/sh -e /usr/src/tmp/rpm-tmp.aiR5Fd  
+find-requires: running scripts (cpp,debuginfo,files,lib,pam,perl,pkgconfig,pkgconfiglib,python,python3,  
+rpmlib,shebang,shell,static,symlinks,systemd-services)  
+Finding debuginfo files (using /usr/lib/rpm/find-debuginfo-files)  
+Executing: /bin/sh -e /usr/src/tmp/rpm-tmp.CsoTgW  
 
 Wrote: /usr/src/RPM/SRPMS/not-null-pkg-1.0-alt1.src.rpm (w2.lzdio)
 Wrote: /usr/src/RPM/RPMS/x86_64/not-null-pkg-1.0-alt1.x86_64.rpm (w2.lzdio)
@@ -322,10 +314,10 @@ RPM/
 
 При установке пакета в систему он устанавливается согласно указанным директориям, благодаря чему встроенная в терминал система поиска утилит определяет его:
 
-`admin`
+`user`
 ```console
-[admin@VM ~]$ cp hasher/chroot/usr/src/RPM/RPMS/x86_64/not-null-pkg-1.0-alt1.x86_64.rpm hasher/chroot/.in/
-[admin@VM ~]$ hsh-shell --rooter
+[user@VM ~]$ cp hasher/chroot/usr/src/RPM/RPMS/x86_64/not-null-pkg-1.0-alt1.x86_64.rpm hasher/chroot/.in/  
+[user@VM ~]$ hsh-shell --rooter  
 ```
 
 `rooter`
