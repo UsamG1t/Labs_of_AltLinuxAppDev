@@ -47,13 +47,13 @@ uid=1000(user) gid=1000(user) группы=1000(user),10(wheel),100(users),997(h
 
 Все действия, связанные с работой `hasher`, контролируются множеством утилит семейства `hsh`.
 
-Перед каждой сборкой нового пакета необходимо пересоздавать окружение, сделать это можно с помощью ключа `--init`. Также окружение автоматически пересоздаётся при открытии архива исходников пакета (`.src.rpm`-файлы). При первом создании окружения необходимо отдельно создать директорию для расположения изолированного блока файловой системы. По умолчанию инструмент ожидает директорию `./hasher/`, однако она может быть любой из разрешённых в файле `/etc/hasher-priv/system` (ключ `prefix=`), в таком случае необходимо одним из параметров передавать путь к расположению директории:
+Перед каждой сборкой нового пакета необходимо пересоздавать окружение, сделать это можно с помощью ключа └──init`. Также окружение автоматически пересоздаётся при открытии архива исходников пакета (`.src.rpm`-файлы). При первом создании окружения необходимо отдельно создать директорию для расположения изолированного блока файловой системы. По умолчанию инструмент ожидает директорию `./hasher/`, однако она может быть любой из разрешённых в файле `/etc/hasher-priv/system` (ключ `prefix=`), в таком случае необходимо одним из параметров передавать путь к расположению директории:
 
 ```console
 [user@VM ~]$ hsh --init  
 /usr/bin/hsh-sh-functions: строка 281: cd: /home/user/hasher: Нет такого файла или каталога  
 [user@VM ~]$ mkdir hasher  
-[user@VM ~]$ hsh -v --init |& tee log
+[user@VM ~]$ hsh -v --init │& tee log
 ```
 
 Рассмотрим [вывод](Attached_materials/%D0%A1%D0%BE%D0%BA%D1%80%D0%B0%D1%89%D1%91%D0%BD%D0%BD%D1%8B%D0%B9%20%D0%B2%D1%8B%D0%B2%D0%BE%D0%B4%20%D0%BF%D1%80%D0%B8%20%D1%81%D0%BE%D0%B7%D0%B4%D0%B0%D0%BD%D0%B8%D0%B8%20%D0%BE%D0%BA%D1%80%D1%83%D0%B6%D0%B5%D0%BD%D0%B8%D1%8F%20hasher.md) при создании окружения и обсудим некоторые составные части `hasher`.
@@ -89,12 +89,12 @@ uid=1000(user) gid=1000(user) группы=1000(user),10(wheel),100(users),997(h
 ```console
 [builder@localhost ~]$ tree RPM
 RPM
-|-- BUILD
-|-- RPMS
-|   `-- noarch
-|-- SOURCES
-|-- SPECS
-`-- SRPMS
+├── BUILD
+├── RPMS
+│   └── noarch
+├── SOURCES
+├── SPECS
+└── SRPMS
 
 7 directories, 0 files
 ```
@@ -128,13 +128,13 @@ This is the smallest ever alt package without any functionality
 
 [builder@localhost ~]$ tree RPM
 RPM
-|-- BUILD
-|-- RPMS
-|   `-- noarch
-|-- SOURCES
-|-- SPECS
-|   `-- null-pkg.spec
-`-- SRPMS
+├── BUILD
+├── RPMS
+│   └── noarch
+├── SOURCES
+├── SPECS
+│   └── null-pkg.spec
+└── SRPMS
 
 7 directories, 1 file
 [builder@localhost ~]$
@@ -170,16 +170,16 @@ Wrote: /usr/src/RPM/RPMS/x86_64/null-pkg-1.0-alt1.x86_64.rpm (w2.lzdio)
 
 [builder@localhost ~]$ tree RPM
 RPM
-|-- BUILD
-|-- RPMS
-|   |-- noarch
-|   `-- x86_64
-|       `-- null-pkg-1.0-alt1.x86_64.rpm
-|-- SOURCES
-|-- SPECS
-|   `-- null-pkg.spec
-`-- SRPMS
-   `-- null-pkg-1.0-alt1.src.rpm
+├── BUILD
+├── RPMS
+│   ├── noarch
+│   └── x86_64
+│       └── null-pkg-1.0-alt1.x86_64.rpm
+├── SOURCES
+├── SPECS
+│   └── null-pkg.spec
+└── SRPMS
+   └── null-pkg-1.0-alt1.src.rpm
 
 8 directories, 3 files
 [builder@localhost ~]$  
@@ -215,12 +215,12 @@ newusers       nice           nl             nohup �
 ```console
 [builder@localhost ~]$ tree RPM
 RPM
-|-- BUILD
-|-- RPMS
-|   `-- noarch
-|-- SOURCES
-|-- SPECS
-`-- SRPMS
+├── BUILD
+├── RPMS
+│   └── noarch
+├── SOURCES
+├── SPECS
+└── SRPMS
 
 [builder@localhost ~]$ vim RPM/SPECS/not-null-pkg.spec  
 [builder@localhost ~]$ cat RPM/SPECS/not-null-pkg.spec    
@@ -295,18 +295,18 @@ Wrote: /usr/src/RPM/SRPMS/not-null-pkg-1.0-alt1.src.rpm (w2.lzdio)
 Wrote: /usr/src/RPM/RPMS/x86_64/not-null-pkg-1.0-alt1.x86_64.rpm (w2.lzdio)
 [builder@localhost ~]$ tree RPM/
 RPM/
-|-- BUILD
-|-- RPMS
-|   |-- noarch
-|   `-- x86_64
-|       `-- not-null-pkg-1.0-alt1.x86_64.rpm
-|-- SOURCES
-|   `-- not-null-pkg-1.0.sh
-|-- SPECS
-|   |-- not-null-pkg.spec
-|   `-- not-null-pkg.spec~
-`-- SRPMS
-   `-- not-null-pkg-1.0-alt1.src.rpm
+├── BUILD
+├── RPMS
+│   ├── noarch
+│   └── x86_64
+│       └── not-null-pkg-1.0-alt1.x86_64.rpm
+├── SOURCES
+│   └── not-null-pkg-1.0.sh
+├── SPECS
+│   ├── not-null-pkg.spec
+│   └── not-null-pkg.spec~
+└── SRPMS
+   └── not-null-pkg-1.0-alt1.src.rpm
 
 8 directories, 5 files
 [builder@localhost ~]$  
