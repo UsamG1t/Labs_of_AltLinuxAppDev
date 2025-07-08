@@ -103,10 +103,9 @@ RPM
 
 Напишем самый простой пакет, не содержащий ничего кроме `spec`-файла.
 
-`@builder`
+`@builder`: `RPM/SPECS/null-pkg.spec`
+
 ```console
-[builder@localhost ~]$ vim RPM/SPECS/null-pkg.spec
-[builder@localhost ~]$ cat RPM/SPECS/null-pkg.spec  
 Name: null-pkg
 Version: 1.0
 Release: alt1
@@ -115,7 +114,7 @@ Summary: Null package
 
 License: GPLv3+
 Group: Development/Other
-Packager: Automated package hasher <hasher@localhost>
+
 
 %description
 This is the smallest ever alt package without any functionality
@@ -123,9 +122,12 @@ This is the smallest ever alt package without any functionality
 %files
 
 %changelog
-* Tue Jul 01 2025 Automated package hasher <hasher@localhost> 1.0-alt1
+* Tue Jul 01 2025 UsamG1t <usamg1t@altlinux.org> 1.0-alt1
 - Initial build
+```
 
+`@builder`
+```
 [builder@localhost ~]$ tree RPM
 RPM
 ├── BUILD
@@ -152,7 +154,6 @@ RPM
 	 + Краткое описание пакета;
 	 + Лицензия на собираемое ПО;
 	 + Категория пакета;
-	 + Разработчик пакета;
  + **Основная часть:**
 	 + Директива `%files` для описания устанавливаемых файлову конечного пользователя (даже если этих файлов нет);
 	 + Директива `%changelog` для записи изменений, произошедших в пакете между сборками разных версий или релизов.
@@ -218,9 +219,11 @@ RPM
 ├── SOURCES
 ├── SPECS
 └── SRPMS
+```
 
-[builder@localhost ~]$ vim RPM/SPECS/not-null-pkg.spec  
-[builder@localhost ~]$ cat RPM/SPECS/not-null-pkg.spec    
+`@builder`: `RPM/SPECS/not-null-pkg.spec`
+
+```console
 Name: not-null-pkg  
 Version: 1.0  
 Release: alt1  
@@ -229,7 +232,6 @@ Summary: Not Null package
   
 License: GPLv3+  
 Group: Development/Other  
-Packager: Automated package hasher <hasher@localhost>  
   
 Source: %name-%version.sh  
   
@@ -237,22 +239,27 @@ Source: %name-%version.sh
 This is not the smallest ever alt package cause of functionality  
   
 %install  
-install -D -pm 755 %_sourcedir/%name-%version.sh %{buildroot}%{_bindir}/%name  
+install -D 755 %SOURCE0 %buildroot%_bindir/%name  
   
 %files  
 %_bindir/*  
   
 %changelog  
-* Tue Jul 01 2025 Automated package hasher <hasher@localhost> 1.0-alt1  
-- Initial build  
-[builder@localhost ~]$
+* Tue Jul 08 2025 UsamG1t <usamg1t@altlinux.org> 1.0-alt1  
+- Initial build
+```
+
+`@builder`: `RPM/SOURCE/not-null-pkg-1.0.sh`
+
+```console
+echo "This is not null pkg"
 ```
 
 Разберём новые директивы и команды.
 
 Директива `Source` в преамбуле описывает набор исходных текстов программы. Напомним, что по правилам сборки `RPM` исходники необходимо размещать в виде `.tar.gz`-архива, мы же для упрощения укажем исключительно один скрипт. Именование архива в обязательном порядке должно содержать имя и версию пакета через дефис, аналогично именованию нашего файла.
 
-В основной части добавилась директива `%install`, которая отвечает за команды установки/копирования файлов из сборочного каталога в псевдо-корневой каталог. Утилита `install` занимается размещением итоговых файлов (исполняемых файлов, документации, библиотек; в нашем случае, исполняемого скрипта) по их конечным директориям. При этом используются [предопределённые макросы](https://www.altlinux.org/Spec/%D0%9F%D1%80%D0%B5%D0%B4%D0%BE%D0%BF%D1%80%D0%B5%D0%B4%D0%B5%D0%BB%D0%B5%D0%BD%D0%BD%D1%8B%D0%B5_%D0%BC%D0%B0%D0%BA%D1%80%D0%BE%D1%81%D1%8B#C%D0%BF%D0%B8%D1%81%D0%BE%D0%BA_%D0%BC%D0%B0%D0%BA%D1%80%D0%BE%D1%81%D0%BE%D0%B2), описывающие место установки данных. Для исплняемого скрипта, изначально размещавшегося в `RPM/SOURCE`, производится установка в псевдокорневой каталог (внутри `RPM/BUILD`) в директорию `/usr/bin`
+В основной части добавилась директива `%install`, которая отвечает за команды установки/копирования файлов из сборочного каталога в псевдо-корневой каталог. Утилита `install` занимается размещением итоговых файлов (исполняемых файлов, документации, библиотек; в нашем случае, исполняемого скрипта) по их конечным директориям. При этом используются [предопределённые макросы](https://www.altlinux.org/Spec/%D0%9F%D1%80%D0%B5%D0%B4%D0%BE%D0%BF%D1%80%D0%B5%D0%B4%D0%B5%D0%BB%D0%B5%D0%BD%D0%BD%D1%8B%D0%B5_%D0%BC%D0%B0%D0%BA%D1%80%D0%BE%D1%81%D1%8B#C%D0%BF%D0%B8%D1%81%D0%BE%D0%BA_%D0%BC%D0%B0%D0%BA%D1%80%D0%BE%D1%81%D0%BE%D0%B2), описывающие место установки данных. Для исплняемого скрипта, изначально размещавшегося в `RPM/SOURCE` (явно к объектам, указанным в директиве `Source` можно обращаться через макрос `%SOURCE@` с индексацией), производится установка в псевдокорневой каталог (внутри `RPM/BUILD`) в директорию `/usr/bin`
 
 Поскольку в итоговый пакет должен попасть исполняемый файл, в директиве `%files` указывается расположение итоговых данных.
 
