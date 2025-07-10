@@ -153,7 +153,7 @@ RPM
 	 + Релиз пакета;
 	 + Краткое описание пакета;
 	 + Лицензия на собираемое ПО;
-	 + Категория пакета (это поле морально устарело, но в ALT продолжает испольозваться);
+	 + Категория пакета (это поле морально устарело, но в ALT продолжает использоваться);
  + **Основная часть:**
 	 + Директива `%files` для описания устанавливаемых файлову конечного пользователя (даже если этих файлов нет);
 	 + Директива `%changelog` для записи изменений, произошедших в пакете между сборками разных версий или релизов.
@@ -198,12 +198,12 @@ RPM
 [root@localhost .in]# rpm -i /usr/src/RPM/RPMS/x86_64/null-pkg-1.0-alt1.x86_64.rpm  
 <13>Jul  1 16:46:01 rpm: null-pkg-1.0-alt1 1751388308 installed
                                                               [root@localhost .in]#  
-[root@localhost .in]# n
-namei          ngettext       nisdomainname  nm             nologin        nsenter
-newusers       nice           nl             nohup          nproc          numfmt
+[root@localhost .in]# which null-pkg  
+which: no null-pkg in (/root/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/sbin:/usr/local/bin:/usr/games)  
+[root@localhost .in]#
 ```
 
-Пакет успешно установился, и, поскольку он пустой, он никак не отображается во внутренней системе поиска.
+Пакет успешно установился, и, поскольку он пустой, он никак не отображается среди скриптов (потому что их нет).
 
 ## Создание примитивного пакета
 
@@ -259,9 +259,9 @@ echo "This is not null pkg"
 
 Обычно при сборке `RPM` каталог с исходными текстами проргаммы упакован в `.tar.gz`-архив, в названии которого встречается имя программы и её версия — их удобно сразу заменять на соответствующие макросы. Мы же для упрощения укажем исключительно один скрипт, сохранив правила именования.
 
-В основной части добавилась директива `%install`, которая отвечает за команды установки/копирования файлов из сборочного каталога в псевдо-корневой каталог. Утилита `install` занимается размещением всех файлов, которые должны входить в пакет (исполняемых файлов, документации, библиотек; в нашем случае — исполняемого скрипта), по их конечным директориям, при этом используются [предопределённые макросы](https://www.altlinux.org/Spec/%D0%9F%D1%80%D0%B5%D0%B4%D0%BE%D0%BF%D1%80%D0%B5%D0%B4%D0%B5%D0%BB%D0%B5%D0%BD%D0%BD%D1%8B%D0%B5_%D0%BC%D0%B0%D0%BA%D1%80%D0%BE%D1%81%D1%8B#C%D0%BF%D0%B8%D1%81%D0%BE%D0%BA_%D0%BC%D0%B0%D0%BA%D1%80%D0%BE%D1%81%D0%BE%D0%B2), описывающие место установки данных. Все исхдные файлы размещаются в каталоге `RPM/SOURCE`. Явно к объекту, указанному в директиве `Source` (или `Source0`) можно обращаться через макрос `%SOURCE0`, `Source1:` — `%SOUIRCE1` и т. д.
+В основной части добавилась директива `%install`, которая отвечает за команды установки/копирования файлов из сборочного каталога в псевдо-корневой каталог. Утилита `install` занимается размещением всех файлов, которые должны входить в пакет (исполняемых файлов, документации, библиотек; в нашем случае — исполняемого скрипта), по их конечным директориям, при этом используются [предопределённые макросы](https://www.altlinux.org/Spec/%D0%9F%D1%80%D0%B5%D0%B4%D0%BE%D0%BF%D1%80%D0%B5%D0%B4%D0%B5%D0%BB%D0%B5%D0%BD%D0%BD%D1%8B%D0%B5_%D0%BC%D0%B0%D0%BA%D1%80%D0%BE%D1%81%D1%8B#C%D0%BF%D0%B8%D1%81%D0%BE%D0%BA_%D0%BC%D0%B0%D0%BA%D1%80%D0%BE%D1%81%D0%BE%D0%B2), описывающие место установки данных. Все исходные файлы размещаются в каталоге `RPM/SOURCE`. Явно к объекту, указанному в директиве `Source` (или `Source0`) можно обращаться через макрос `%SOURCE0`, `Source1:` — `%SOURCE1` и т. д.
 
-Для сборки пакета не нужен (в ALT — **запрещён**) root. Во время сборки файлы устанавливаебются в псевдокорневой каталог (как правило, `/usr/src/tmp/_имя-пакета_-buildroot/`; он обозначается макросом `%buildroot`). Наш скрипт попадает в поддиректорию `/usr/bin`.
+Для сборки пакета не нужен (в ALT — **запрещён**) root. Во время сборки файлы устанавливаются в псевдокорневой каталог (как правило, `/usr/src/tmp/_имя-пакета_-buildroot/`; он обозначается макросом `%buildroot`). Наш скрипт попадает в поддиректорию `/usr/bin`.
 
 Поскольку в итоговый пакет должен попасть исполняемый файл, в директиве `%files` указывается расположение итоговых данных.
 
@@ -280,12 +280,12 @@ Executing(%install): /bin/sh -e /usr/src/tmp/rpm-tmp.81856
 + /bin/chmod -Rf u+rwX -- /usr/src/tmp/not-null-pkg-buildroot
 + /bin/rm -rf -- /usr/src/tmp/not-null-pkg-buildroot
 ```
-* Установка файлов пакета (в пример это едмнственный скрипт):
+* Установка файлов пакета (в пример это единственный скрипт):
 ```
 + PATH=/usr/libexec/rpm-build:/usr/src/bin:/usr/bin:/bin:/usr/local/bin:/usr/games
 + install -D -pm 755 /usr/src/RPM/SOURCES/not-null-pkg-1.0.sh /usr/src/tmp/not-null-pkg-buildroot/usr/bin/not-null-pkg
 ```
-* Проверка, соответствуют ли файлы пакетв Build ALT Policy (дисциплине сборки пакетов ALT):
+* Проверка, соответствуют ли файлы пакета Build ALT Policy (дисциплине сборки пакетов ALT):
 ```
 + /usr/lib/rpm/brp-alt
 Cleaning files in /usr/src/tmp/not-null-pkg-buildroot (auto)  
@@ -295,7 +295,7 @@ Compressing files in /usr/src/tmp/not-null-pkg-buildroot (auto)
 Verifying ELF objects in /usr/src/tmp/not-null-pkg-buildroot (arch=normal,fhs=normal,lfs=relaxed,lint=relaxed,rpath=normal,stack=normal,textrel=normal,unresolved=normal)  
 Splitting links to aliased files under /{,s}bin in /usr/src/tmp/not-null-pkg-buildroot  
 ```
-* Определение эксплуатационых зависимостей пакета, а также _предоставляемых_ им зависимостей и созможных отладочных компонентов:
+* Определение эксплуатационых зависимостей пакета, а также _предоставляемых_ им зависимостей и возможных отладочных компонентов:
 ```
 Processing files: not-null-pkg-1.0-alt1  
 Finding Provides (using /usr/lib/rpm/find-provides)  
@@ -333,13 +333,33 @@ RPM/
    └── not-null-pkg-1.0-alt1.src.rpm
 
 8 directories, 5 files
-[builder@localhost ~]$  
+[builder@localhost ~]$
+
 ```
 
-**TODO** вот тут запустить 
- * `tree tmp` — желательно, сначала удалить `tmp` и вчистуювсё перемобрать, чтобы иусора там не было
- * `rpmquery --list --package /usr/src/RPM/RPMS/x86_64/not-null-pkg-1.0-alt1.x86_64.rpm`
- * `rpmquery --requires --package /usr/src/RPM/RPMS/x86_64/not-null-pkg-1.0-alt1.x86_64.rpm`
+После сборки пакета в `/tmp` некоторое время хранятся данные со сборки:
+
+```
+[builder@localhost ~]$ tree -A tmp  
+tmp  
+└── not-null-pkg-buildroot  
+   └── usr  
+       └── bin  
+           └── not-null-pkg  
+  
+4 directories, 1 file  
+
+```
+
+В данных двоичного пакета размещаются описание составляющих его файлов, а также зависимости пакета: 
+
+```console
+[builder@localhost ~]$ rpmquery --list --package RPM/RPMS/x86_64/not-null-pkg-1.0-alt1.x86_64.rpm  
+/usr/bin/not-null-pkg  
+[builder@localhost ~]$ rpmquery --requires --package RPM/RPMS/x86_64/not-null-pkg-1.0-alt1.x86_64.rpm  
+rpmlib(PayloadIsLzma)     
+[builder@localhost ~]$
+```
 
 При установке пакета в систему файлы раскладываются по соответствующим поддиректориям корневого каталога. Поскольку раш скрипт исполняемый и лежит в `/usr/bin`, а эта директория входит в стандартный `$PATH`, скрипт можно запустить просто по имени:
 
