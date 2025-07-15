@@ -2,7 +2,10 @@
 
 WORKDIR=$HOME/.config/shell-pkg
 TODOLIST=$WORKDIR/todo-list
-answer_file=$WORKDIR/ans-file
+ANSWER_FILE=`mktemp --suffix=-shell-pkg`
+
+exit_handler() { trap - EXIT; rm -f "$ANSWER_FILE"; }
+trap exit_handler EXIT HUP INT QUIT PIPE TERM
 
 Start_check() {
 	[ -z "$TERM" ] && export TERM=xterm
@@ -26,10 +29,10 @@ Menu() {
 
 	Auto_screensize
 	dialog --title $title --ok-label "Choose" --cancel-label "Exit" \
-		   --radiolist "" $(($W-10)) $(($H-10)) 3 $point0 $point1 $point2 2> "$answer_file"
+		   --radiolist "" $(($W-10)) $(($H-10)) 3 $point0 $point1 $point2 2> "$ANSWER_FILE"
 
 	if [ $? = 0 ]; then
-		read answer < "$answer_file"
+		read answer < "$ANSWER_FILE"
 		echo $answer
 		case $answer in
 			0)
@@ -48,10 +51,10 @@ Menu() {
 Add_todo() {
 	title="Please write your TODO"
 	Auto_screensize
-	dialog --inputbox "$title" $(($W-10)) $(($H-10)) 2> "$answer_file"
+	dialog --inputbox "$title" $(($W-10)) $(($H-10)) 2> "$ANSWER_FILE"
 
 	if [ $? = 0 ]; then
-		read answer < "$answer_file"
+		read answer < "$ANSWER_FILE"
 		((TODOCOUNT++))
 		(echo -n "$TODOCOUNT NEW " && echo $answer) >> $TODOLIST
 	fi
@@ -95,10 +98,10 @@ Solve_todo() {
 	Auto_screensize
 	dialog --title "$title" \
 		   --checklist "" $(($W-10)) $(($H-10)) $count $(echo $unsolved_todo) \
-		   2> "$answer_file"
+		   2> "$ANSWER_FILE"
 
 	if [ $? = 0 ]; then
-		read answer < "$answer_file"
+		read answer < "$ANSWER_FILE"
 		for num in $answer; do
     		sed -i -E "s/($num) NEW/\\1 DONE/" "$TODOLIST"
 		done
