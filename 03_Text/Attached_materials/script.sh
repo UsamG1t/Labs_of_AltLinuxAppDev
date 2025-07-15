@@ -17,42 +17,30 @@ Auto_screensize() {
 
 Menu() {
 	title="ShellPkg"
-	point0="0 Todo-list"
-	point1="1 Add_todo"
-	point2="2 Solve_todo"
 
 	Auto_screensize
-	dialog --title $title --ok-label "Choose" --cancel-label "Exit" \
-		   --menu "" $(($W-10)) $(($H-10)) 3 $point0 $point1 $point2 2> "$ANSWER_FILE"
-
-	if [ $? = 0 ]; then
+	if dialog --title $title --ok-label "Choose" --cancel-label "Exit" \
+		--menu "" $(($W-10)) $(($H-10)) 3 \
+		Show_todo "Todo list" \
+		Add_todo "Add todo" \
+		Solve_todo "Solve todo" \
+		2> "$ANSWER_FILE"
+	then
 		read answer < "$ANSWER_FILE"
-		case $answer in
-			0)
-				Show_todo
-				;;
-			1)
-				Add_todo
-				;;
-			2)
-				Solve_todo
-				;;
-		esac
+		$answer
 	fi
 }
 
 Add_todo() {
 	title="Please write your TODO"
 	Auto_screensize
-	dialog --inputbox "$title" $(($W-10)) $(($H-10)) 2> "$ANSWER_FILE"
-
-	if [ $? = 0 ]; then
+	if dialog --inputbox "$title" $(($W-10)) $(($H-10)) 2> "$ANSWER_FILE"
+	then
 		read answer < "$ANSWER_FILE"
 		((TODOCOUNT++))
 		echo "$TODOCOUNT NEW $answer" >> $TODOLIST
 	fi
 
-	# cat $TODOLIST
 	Menu	
 
 }
@@ -88,11 +76,10 @@ Solve_todo() {
 	done < "$TODOLIST"
 
 	Auto_screensize
-	dialog --title "$title" \
+	if dialog --title "$title" \
 		   --checklist "" $(($W-10)) $(($H-10)) $count $unsolved_todo \
 		   2> "$ANSWER_FILE"
-
-	if [ $? = 0 ]; then
+	then
 		read answer < "$ANSWER_FILE"
 		for num in $answer; do
     		sed -i -E "s/($num) NEW/\\1 DONE/" "$TODOLIST"
