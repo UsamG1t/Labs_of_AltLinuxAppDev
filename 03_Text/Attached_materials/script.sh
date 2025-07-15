@@ -1,6 +1,6 @@
 #!/bin/sh
 
-WORKDIR=$HOME/.cache/shell-pkg
+WORKDIR=$HOME/.config/shell-pkg
 TODOLIST=$WORKDIR/todo-list
 answer_file=$WORKDIR/ans-file
 
