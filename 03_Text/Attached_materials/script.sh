@@ -7,13 +7,9 @@ ANSWER_FILE=`mktemp --suffix=-shell-pkg`
 exit_handler() { trap - EXIT; rm -f "$ANSWER_FILE"; }
 trap exit_handler EXIT HUP INT QUIT PIPE TERM
 
-Start_check() {
-	if [ ! -d "$WORKDIR" ]; then
-		mkdir "$WORKDIR"
-	fi
-	touch $TODOLIST
-	TODOCOUNT=`cat $TODOLIST | wc -l`
-}
+mkdir -p $WORKDIR
+test -r $TODOLIST || touch $TODOLIST
+TODOCOUNT=`wc -l < $TODOLIST`
 
 Auto_screensize() {
 	eval `dialog --print-maxsize --stdout | sed -E 's/.* (.*), (.*)/W=\1; H=\2/'`
@@ -108,5 +104,4 @@ Solve_todo() {
 	Menu
 }
 
-Start_check
 Menu
