@@ -70,7 +70,7 @@ Solve_todo() {
 	count=0
 	while read number status todo; do
 		if [ $status = "NEW" ]; then
-			unsolved_todo="$unsolved_todo $number $todo off"
+			unsolved_todo="$unsolved_todo $number ${todo// / } off"
 			((count++))
 		fi
 	done < "$TODOLIST"
