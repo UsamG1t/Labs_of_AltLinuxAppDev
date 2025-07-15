@@ -1,0 +1,111 @@
+#!/bin/sh
+
+WORKDIR=$HOME/.cache/shell-pkg
+TODOLIST=$WORKDIR/todo-list
+answer_file=$WORKDIR/ans-file
+
+Start_check() {
+	[ -z "$TERM" ] && export TERM=xterm
+
+	if [ ! -d "$WORKDIR" ]; then
+		mkdir "$WORKDIR"
+	fi
+	touch $TODOLIST
+	TODOCOUNT=`cat $TODOLIST | wc -l`
+}
+
+Auto_screensize() {
+	eval `dialog --print-maxsize --stdout | sed -E 's/.* (.*), (.*)/W=\1; H=\2/'`
+}
+
+Menu() {
+	title="ShellPkg"
+	point0="0 Todo-list 1"
+	point1="1 Add_todo 1"
+	point2="2 Solve_todo 1"
+
+	Auto_screensize
+	dialog --title $title --ok-label "Choose" --cancel-label "Exit" \
+		   --radiolist "" $(($W-10)) $(($H-10)) 3 $point0 $point1 $point2 2> "$answer_file"
+
+	if [ $? = 0 ]; then
+		read answer < "$answer_file"
+		echo $answer
+		case $answer in
+			0)
+				Show_todo
+				;;
+			1)
+				Add_todo
+				;;
+			2)
+				Solve_todo
+				;;
+		esac
+	fi
+}
+
+Add_todo() {
+	title="Please write your TODO"
+	Auto_screensize
+	dialog --inputbox "$title" $(($W-10)) $(($H-10)) 2> "$answer_file"
+
+	if [ $? = 0 ]; then
+		read answer < "$answer_file"
+		((TODOCOUNT++))
+		(echo -n "$TODOCOUNT NEW " && echo $answer) >> $TODOLIST
+	fi
+
+	# cat $TODOLIST
+	Menu	
+
+}
+
+Show_todo() {
+	title="List of all your TODO"
+	solved_todo="Solved todo:\n"
+	unsolved_todo="Unsolved todo:\n"
+	
+	while read number status todo; do
+		if [ $status = "NEW" ]; then
+			unsolved_todo="$unsolved_todo - $todo\n"
+		else
+			solved_todo="$solved_todo - $todo\n"
+		fi
+	done < "$TODOLIST"
+
+	Auto_screensize
+	dialog --title "$title" \
+			--msgbox "$(echo $solved_todo && echo $unsolved_todo)" $(($W-10)) $(($H-10))
+	Menu
+}
+
+
+Solve_todo() {
+	title="Point solved todo"
+	unsolved_todo=""
+	count=0
+	while read number status todo; do
+		if [ $status = "NEW" ]; then
+			unsolved_todo="$unsolved_todo $number $todo off"
+			((count++))
+		fi
+	done < "$TODOLIST"
+
+	Auto_screensize
+	dialog --title "$title" \
+		   --checklist "" $(($W-10)) $(($H-10)) $count $(echo $unsolved_todo) \
+		   2> "$answer_file"
+
+	if [ $? = 0 ]; then
+		read answer < "$answer_file"
+		for num in $answer; do
+    		sed -i -E "s/($num) NEW/\\1 DONE/" "$TODOLIST"
+		done
+	fi
+	
+	Menu
+}
+
+Start_check
+Menu
