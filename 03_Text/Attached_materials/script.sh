@@ -8,8 +8,6 @@ exit_handler() { trap - EXIT; rm -f "$ANSWER_FILE"; }
 trap exit_handler EXIT HUP INT QUIT PIPE TERM
 
 Start_check() {
-	[ -z "$TERM" ] && export TERM=xterm
-
 	if [ ! -d "$WORKDIR" ]; then
 		mkdir "$WORKDIR"
 	fi
