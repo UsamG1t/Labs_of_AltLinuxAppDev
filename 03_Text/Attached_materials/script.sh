@@ -82,7 +82,7 @@ Solve_todo() {
 	then
 		read answer < "$ANSWER_FILE"
 		for num in $answer; do
-    		sed -i -E "s/($num) NEW/\\1 DONE/" "$TODOLIST"
+    		sed -i -E "s/^($num) NEW/\\1 DONE/" "$TODOLIST"
 		done
 	fi
 	
