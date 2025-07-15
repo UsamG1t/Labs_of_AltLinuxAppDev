@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 WORKDIR=$HOME/.config/shell-pkg
 TODOLIST=$WORKDIR/todo-list
@@ -16,39 +16,34 @@ Auto_screensize() {
 }
 
 Menu() {
-	title="ShellPkg"
-
 	Auto_screensize
-	if dialog --title $title --ok-label "Choose" --cancel-label "Exit" \
+	if dialog --title ShellPkg --ok-label "Choose" --cancel-label "Exit" \
 		--menu "" $WW $HH 3 \
 		Show_todo "Todo list" \
-		Add_todo "Add todo" \
-		Solve_todo "Solve todo" \
+		Add_todo "Add TODO" \
+		Solve_todo "Solve TODO" \
 		2> "$ANSWER_FILE"
 	then
 		read answer < "$ANSWER_FILE"
 		$answer
+	else
+		return -1
 	fi
 }
 
 Add_todo() {
-	title="Please write your TODO"
 	Auto_screensize
-	if dialog --inputbox "$title" $WW $HH 2> "$ANSWER_FILE"
+	if dialog --inputbox "Please write your TODO" $WW $HH 2> "$ANSWER_FILE"
 	then
 		read answer < "$ANSWER_FILE"
 		((TODOCOUNT++))
 		echo "$TODOCOUNT NEW $answer" >> $TODOLIST
 	fi
-
-	Menu	
-
 }
 
 Show_todo() {
-	title="List of all your TODO"
-	solved_todo="Solved todo:\n"
-	unsolved_todo="Unsolved todo:\n"
+	solved_todo="Solved TODO:\n"
+	unsolved_todo="Unsolved TODO:\n"
 	
 	while read number status todo; do
 		if [ $status = "NEW" ]; then
@@ -59,13 +54,11 @@ Show_todo() {
 	done < "$TODOLIST"
 
 	Auto_screensize
-	dialog --title "$title" --msgbox "$solved_todo$unsolved_todo" $WW $HH
-	Menu
+	dialog --title "List of all your TODO" --msgbox "$solved_todo$unsolved_todo" $WW $HH
 }
 
 
 Solve_todo() {
-	title="Point solved todo"
 	unsolved_todo=""
 	count=0
 	while read number status todo; do
@@ -76,17 +69,15 @@ Solve_todo() {
 	done < "$TODOLIST"
 
 	Auto_screensize
-	if dialog --title "$title" \
+	if dialog --title "Mark solved TOSOs" \
 		   --checklist "" $WW $HH $count $unsolved_todo \
 		   2> "$ANSWER_FILE"
 	then
 		read answer < "$ANSWER_FILE"
 		for num in $answer; do
-    		sed -i -E "s/^($num) NEW/\\1 DONE/" "$TODOLIST"
+		sed -i -E "s/^($num) NEW/\\1 DONE/" "$TODOLIST"
 		done
 	fi
-	
-	Menu
 }
 
-Menu
+while Menu; do :; done
