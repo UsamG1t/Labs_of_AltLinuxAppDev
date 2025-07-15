@@ -12,7 +12,7 @@ test -r $TODOLIST || touch $TODOLIST
 TODOCOUNT=`wc -l < $TODOLIST`
 
 Auto_screensize() {
-	eval `dialog --print-maxsize --stdout | sed -E 's/.* (.*), (.*)/W=\1; H=\2/'`
+	eval `dialog --print-maxsize --stdout | sed -E 's/.* (.*), (.*)/W=\1; H=\2; WW=$((W-10)); HH=$((H-10))/'`
 }
 
 Menu() {
@@ -20,7 +20,7 @@ Menu() {
 
 	Auto_screensize
 	if dialog --title $title --ok-label "Choose" --cancel-label "Exit" \
-		--menu "" $(($W-10)) $(($H-10)) 3 \
+		--menu "" $WW $HH 3 \
 		Show_todo "Todo list" \
 		Add_todo "Add todo" \
 		Solve_todo "Solve todo" \
@@ -34,7 +34,7 @@ Menu() {
 Add_todo() {
 	title="Please write your TODO"
 	Auto_screensize
-	if dialog --inputbox "$title" $(($W-10)) $(($H-10)) 2> "$ANSWER_FILE"
+	if dialog --inputbox "$title" $WW $HH 2> "$ANSWER_FILE"
 	then
 		read answer < "$ANSWER_FILE"
 		((TODOCOUNT++))
@@ -59,7 +59,7 @@ Show_todo() {
 	done < "$TODOLIST"
 
 	Auto_screensize
-	dialog --title "$title" --msgbox "$solved_todo$unsolved_todo" $(($W-10)) $(($H-10))
+	dialog --title "$title" --msgbox "$solved_todo$unsolved_todo" $WW $HH
 	Menu
 }
 
@@ -77,7 +77,7 @@ Solve_todo() {
 
 	Auto_screensize
 	if dialog --title "$title" \
-		   --checklist "" $(($W-10)) $(($H-10)) $count $unsolved_todo \
+		   --checklist "" $WW $HH $count $unsolved_todo \
 		   2> "$ANSWER_FILE"
 	then
 		read answer < "$ANSWER_FILE"
