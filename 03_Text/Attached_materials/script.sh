@@ -27,7 +27,6 @@ Menu() {
 
 	if [ $? = 0 ]; then
 		read answer < "$ANSWER_FILE"
-		echo $answer
 		case $answer in
 			0)
 				Show_todo
@@ -50,7 +49,7 @@ Add_todo() {
 	if [ $? = 0 ]; then
 		read answer < "$ANSWER_FILE"
 		((TODOCOUNT++))
-		(echo -n "$TODOCOUNT NEW " && echo $answer) >> $TODOLIST
+		echo "$TODOCOUNT NEW $answer" >> $TODOLIST
 	fi
 
 	# cat $TODOLIST
@@ -72,8 +71,7 @@ Show_todo() {
 	done < "$TODOLIST"
 
 	Auto_screensize
-	dialog --title "$title" \
-			--msgbox "$(echo $solved_todo && echo $unsolved_todo)" $(($W-10)) $(($H-10))
+	dialog --title "$title" --msgbox "$solved_todo$unsolved_todo" $(($W-10)) $(($H-10))
 	Menu
 }
 
@@ -91,7 +89,7 @@ Solve_todo() {
 
 	Auto_screensize
 	dialog --title "$title" \
-		   --checklist "" $(($W-10)) $(($H-10)) $count $(echo $unsolved_todo) \
+		   --checklist "" $(($W-10)) $(($H-10)) $count $unsolved_todo \
 		   2> "$ANSWER_FILE"
 
 	if [ $? = 0 ]; then
