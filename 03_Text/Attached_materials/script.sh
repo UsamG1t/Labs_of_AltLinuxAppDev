@@ -21,13 +21,13 @@ Auto_screensize() {
 
 Menu() {
 	title="ShellPkg"
-	point0="0 Todo-list 1"
-	point1="1 Add_todo 1"
-	point2="2 Solve_todo 1"
+	point0="0 Todo-list"
+	point1="1 Add_todo"
+	point2="2 Solve_todo"
 
 	Auto_screensize
 	dialog --title $title --ok-label "Choose" --cancel-label "Exit" \
-		   --radiolist "" $(($W-10)) $(($H-10)) 3 $point0 $point1 $point2 2> "$ANSWER_FILE"
+		   --menu "" $(($W-10)) $(($H-10)) 3 $point0 $point1 $point2 2> "$ANSWER_FILE"
 
 	if [ $? = 0 ]; then
 		read answer < "$ANSWER_FILE"
