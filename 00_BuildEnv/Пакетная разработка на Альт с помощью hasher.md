@@ -2,11 +2,11 @@
 
 ---
 
-Итогом в рамках разработки под Linux является ***пакет***. Пакетом называются ресурсы, необходимые для установки и интеграции в систему некоторого компонента (архив файлов, до- и послеустановочные сценарии, информация о пакете и его сопровождающем), объединённые в одном файле. Основной материал курса направлен на изучение парадигм и технологий локальной разработки. Лабораторные работы будут объединять полученные знания в рамках сборки пакетов программ. В линейке дистрибутивов Альт используется формат пакетов [RPM](https://docs.altlinux.org/ru-RU/alt-platform/10.1/html-single/alt-platform/index.html#id864). Различают `.rpm`-пакеты, непосредственно предназначенные для установки компонентов в систему, и `.src.rpm`-пакеты, содержащие все необходимые для сборки `.rpm`-пакета данные — исходные тексты и сценарии сборки.
+Итогом в рамках разработки под Linux является ***пакет***. Пакетом называются ресурсы, необходимые для установки и интеграции в систему некоторого компонента (архив файлов, до- и послеустановочные сценарии, информация о пакете и его сопровождающем), объединённые в одном файле. Основной материал курса направлен на изучение парадигм и технологий локальной разработки. Лабораторные работы будут объединять полученные знания в рамках сборки пакетов программ. В линейке дистрибутивов Альт используется формат пакетов [RPM](https://docs.altlinux.org/ru-RU/alt-platform/10.1/html-single/alt-platform/#rpm-paket). Различают `.rpm`-пакеты, непосредственно предназначенные для установки компонентов в систему, и `.src.rpm`-пакеты, содержащие все необходимые для сборки `.rpm`-пакета данные — исходные тексты и сценарии сборки.
 
 # `Hasher by ALT Linux Team`
 
-В рамках разработки на [Альт Платформе](https://docs.altlinux.org/ru-RU/alt-platform/10.1/html-single/alt-platform/index.html#whatis) используется специальный инструмент [`hasher`](https://docs.altlinux.org/ru-RU/alt-platform/10.1/html-single/alt-platform/index.html#hasher--chapter). Это средство безопасной и воспроизводимой сборки пакетов в «чистой» и контролируемой среде. `Hasher` организует изолированное пространство (файловая система, процессы, отсутствие доступа к сети по умолчанию и т. п.), устанавливает туда базовую систему и все сборочные зависимости, после чего запускает сборку пакета. Главная особенность `hasher` — в нём можно запускать непроверенный и потенциально небезопасный код, не опасаясь его воздействия на внешнюю систему. В сборочном окружении `hasher` нет суперпользователя (его заменяет системный пользователь с обычными правами и библиотека `fakeroot`), все процессы запускаются либо с его правами, либо с правами второго системного пользователя, и ни один из этих процессов не имеет доступа к ресурсам внешней системы. Однако для сборки пакетов предоставляется кое-какая информация извне (например, объём памяти и количество ядер процессора) и некоторые свойства ОС (например, работа с псевдотерминалами, иногда требуется поддержка сети и т. п.). Скорость работы приложений в `hasher` не снижается, но каждый раз среда разворачивается заново, чтобы исключить влияние предыдущей сборки на последующую.
+В рамках разработки на [Альт Платформе](https://docs.altlinux.org/ru-RU/alt-platform/10.1/html-single/alt-platform/#whatis) используется специальный инструмент [`hasher`](https://docs.altlinux.org/ru-RU/alt-platform/10.1/html-single/alt-platform/#hasher--chapter). Это средство безопасной и воспроизводимой сборки пакетов в «чистой» и контролируемой среде. `Hasher` организует изолированное пространство (файловая система, процессы, отсутствие доступа к сети по умолчанию и т. п.), устанавливает туда базовую систему и все сборочные зависимости, после чего запускает сборку пакета. Главная особенность `hasher` — в нём можно запускать непроверенный и потенциально небезопасный код, не опасаясь его воздействия на внешнюю систему. В сборочном окружении `hasher` нет суперпользователя (его заменяет системный пользователь с обычными правами и библиотека `fakeroot`), все процессы запускаются либо с его правами, либо с правами второго системного пользователя, и ни один из этих процессов не имеет доступа к ресурсам внешней системы. Однако для сборки пакетов предоставляется кое-какая информация извне (например, объём памяти и количество ядер процессора) и некоторые свойства ОС (например, работа с псевдотерминалами, иногда требуется поддержка сети и т. п.). Скорость работы приложений в `hasher` не снижается, но каждый раз среда разворачивается заново, чтобы исключить влияние предыдущей сборки на последующую.
 
 Некоторые следствия данной парадигмы работы `hasher`:
  + Все необходимые для сборки зависимости должны быть установлены заранее, либо взяты из `.src.rpm`-пакета;
@@ -22,22 +22,22 @@
 Регистрация выполняется суперпользователем с помощью команды `hasher-useradd`:
 
 ```console
-[root@VM ~]# id user    
-uid=1000(user) gid=1000(user) группы=1000(user),10(wheel),100(users),36(vmusers)  
+[root@VM ~]# id user  
+uid=1000(user) gid=1000(user) группы=1000(user),10(wheel),100(users),36(vmusers)
 
-[root@VM ~]# hasher-useradd user  
-useradd: Warning: missing or non-executable shell '/dev/null'  
-useradd: Warning: missing or non-executable shell '/dev/null'  
-Добавление пользователя user в группу user_a  
-Добавление пользователя user в группу user_b  
-Добавление пользователя user в группу hashman  
-hasher-useradd: enabling hasher-privd  
-Внимание: Отправляется запрос 'systemctl enable hasher-privd.service'.  
-Synchronizing state of hasher-privd.service with SysV service script with /usr/lib/systemd/systemd-sysv-install.  
-Executing: /usr/lib/systemd/systemd-sysv-install enable hasher-privd hasher-useradd: starting hasher-privd  
+[root@VM ~]# hasher-useradd user
+useradd: Warning: missing or non-executable shell '/dev/null'
+useradd: Warning: missing or non-executable shell '/dev/null'
+Добавление пользователя user в группу user_a
+Добавление пользователя user в группу user_b
+Добавление пользователя user в группу hashman
+hasher-useradd: enabling hasher-privd
+Внимание: Отправляется запрос 'systemctl enable hasher-privd.service'.
+Synchronizing state of hasher-privd.service with SysV service script with /usr/lib/systemd/systemd-sysv-install.
+Executing: /usr/lib/systemd/systemd-sysv-install enable hasher-privd hasher-useradd: starting hasher-privd
 
-[root@VM ~]# id user  
-uid=1000(user) gid=1000(user) группы=1000(user),10(wheel),100(users),997(hashman),1001(user_a),1002(user_b),36(vmusers)  
+[root@VM ~]# id user
+uid=1000(user) gid=1000(user) группы=1000(user),10(wheel),100(users),997(hashman),1001(user_a),1002(user_b),36(vmusers)
 [root@VM ~]#
 ```
 
@@ -50,9 +50,9 @@ uid=1000(user) gid=1000(user) группы=1000(user),10(wheel),100(users),997(h
 Перед каждой сборкой нового пакета необходимо пересоздавать окружение, сделать это можно с помощью ключа `--init`. Также окружение автоматически пересоздаётся при открытии архива исходников пакета (`.src.rpm`-файлы). При первом создании окружения необходимо отдельно создать директорию для расположения изолированного блока файловой системы. По умолчанию инструмент ожидает директорию `./hasher/`, однако она может быть любой из разрешённых в файле `/etc/hasher-priv/system` (ключ `prefix=`), в таком случае необходимо одним из параметров передавать путь к расположению директории:
 
 ```console
-[user@VM ~]$ hsh --init  
-/usr/bin/hsh-sh-functions: строка 281: cd: /home/user/hasher: Нет такого файла или каталога  
-[user@VM ~]$ mkdir hasher  
+[user@VM ~]$ hsh --init
+/usr/bin/hsh-sh-functions: строка 281: cd: /home/user/hasher: Нет такого файла или каталога
+[user@VM ~]$ mkdir hasher
 [user@VM ~]$ hsh -v --init │& tee log
 ```
 
@@ -67,10 +67,10 @@ uid=1000(user) gid=1000(user) группы=1000(user),10(wheel),100(users),997(h
  + `hsh-install` для установки пакетов из репозиториев Альт
 
 ```console
-[user@VM ~]$ hsh --init  
-<...>  
-[user@VM ~]$ hsh-install vim-console tree  
-<...>  
+[user@VM ~]$ hsh --init
+<...>
+[user@VM ~]$ hsh-install vim-console tree
+<...>
 [user@VM ~]$
 ```
 
@@ -80,8 +80,8 @@ uid=1000(user) gid=1000(user) группы=1000(user),10(wheel),100(users),997(h
 
 ## Создание нулевого пакета
 
-Разберём структуру `hasher` согласно правилам разработки [`RPM`](https://docs.altlinux.org/ru-RU/alt-platform/10.1/html-single/alt-platform/index.html#id864)-пакетов. `RPM`-пакет состоит из архива файлов, а также заголовка, содержащего метаданные о пакете.
-Различают **пакеты с исходным кодом** (`.src.rpm`), состоящих из исходников и [`spec`-файла](https://docs.altlinux.org/ru-RU/alt-platform/10.1/html-single/alt-platform/index.html#id868), представляющего из себя инструкцию по сборке пакета, и собственно **пакеты** (`.rpm`), непосредственно устанавливающиеся в систему.
+Разберём структуру `hasher` согласно правилам разработки [RPM](https://docs.altlinux.org/ru-RU/alt-platform/10.1/html-single/alt-platform/#rpm-paket)-пакетов. `RPM`-пакет состоит из архива файлов, а также заголовка, содержащего метаданные о пакете.
+Различают **пакеты с исходным кодом** (`.src.rpm`), состоящих из исходников и [`spec`-файла](https://docs.altlinux.org/ru-RU/alt-platform/10.1/html-single/alt-platform/#spec-fajl), представляющего из себя инструкцию по сборке пакета, и собственно **пакеты** (`.rpm`), непосредственно устанавливающиеся в систему.
 
 `Hasher` для работы содержит специальное дерево директорий, по которому автоматически или вручную распределяются файлы для сборки:
 
@@ -158,7 +158,7 @@ RPM
 	 + Директива `%files` для описания устанавливаемых файлову конечного пользователя (даже если этих файлов нет);
 	 + Директива `%changelog` для записи изменений, произошедших в пакете между сборками разных версий или релизов.
 
-Подробнее познакомиться с другими директивами можно по [ссылке](https://docs.altlinux.org/ru-RU/alt-platform/10.1/html-single/alt-platform/index.html#id865). В рамках лабораторных работ в дальнейшем будут рассмотрены и другие директивы (как, например, необязательная директива `%description`, содержащая более подробное описание функциональности пакета).
+Подробнее познакомиться с другими директивами можно по [ссылке](https://docs.altlinux.org/ru-RU/alt-platform/10.1/html-single/alt-platform/#direktivy_preambuly). В рамках лабораторных работ в дальнейшем будут рассмотрены и другие директивы (как, например, необязательная директива `%description`, содержащая более подробное описание функциональности пакета).
 
 Сборка пакетов осуществляется с помощью команды `rpmbuild`. Ключ `-ba` (`build all`) собирает как двоичный пакет, так и новый пакет с исходным кодом.
 
@@ -190,7 +190,7 @@ RPM
 
 `@user`
 ```console
-[user@VM ~]$ hsh-shell --rooter  
+[user@VM ~]$ hsh-shell --rooter
 ```
 
 `@rooter`
@@ -198,8 +198,8 @@ RPM
 [root@localhost .in]# rpm -i /usr/src/RPM/RPMS/x86_64/null-pkg-1.0-alt1.x86_64.rpm  
 <13>Jul  1 16:46:01 rpm: null-pkg-1.0-alt1 1751388308 installed
                                                               [root@localhost .in]#  
-[root@localhost .in]# which null-pkg  
-which: no null-pkg in (/root/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/sbin:/usr/local/bin:/usr/games)  
+[root@localhost .in]# which null-pkg
+which: no null-pkg in (/root/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/sbin:/usr/local/bin:/usr/games)
 [root@localhost .in]#
 ```
 
@@ -224,28 +224,28 @@ RPM
 `@builder`: `RPM/SPECS/not-null-pkg.spec`
 
 ```console
-Name: not-null-pkg  
-Version: 1.0  
-Release: alt1  
-  
-Summary: Not Null package  
-  
-License: GPLv3+  
-Group: Development/Other  
-  
-Source: %name-%version.sh  
-  
-%description  
-This is not the smallest ever alt package cause of functionality  
-  
-%install  
-install -D 755 %SOURCE0 %buildroot%_bindir/%name  
-  
-%files  
-%_bindir/*  
-  
-%changelog  
-* Tue Jul 08 2025 UsamG1t <usamg1t@altlinux.org> 1.0-alt1  
+Name: not-null-pkg
+Version: 1.0
+Release: alt1
+
+Summary: Not Null package
+
+License: GPLv3+
+Group: Development/Other
+
+Source: %name-%version.sh
+
+%description
+This is not the smallest ever alt package cause of functionality
+
+%install
+install -D 755 %SOURCE0 %buildroot%_bindir/%name
+
+%files
+%_bindir/*
+
+%changelog
+* Tue Jul 08 2025 UsamG1t <usamg1t@altlinux.org> 1.0-alt1
 - Initial build
 ```
 
@@ -259,7 +259,7 @@ echo "This is not null pkg"
 
 Обычно при сборке `RPM` каталог с исходными текстами проргаммы упакован в `.tar.gz`-архив, в названии которого встречается имя программы и её версия — их удобно сразу заменять на соответствующие макросы. Мы же для упрощения укажем исключительно один скрипт, сохранив правила именования.
 
-В основной части добавилась директива `%install`, которая отвечает за команды установки/копирования файлов из сборочного каталога в псевдо-корневой каталог. Утилита `install` занимается размещением всех файлов, которые должны входить в пакет (исполняемых файлов, документации, библиотек; в нашем случае — исполняемого скрипта), по их конечным директориям, при этом используются [предопределённые макросы](https://www.altlinux.org/Spec/%D0%9F%D1%80%D0%B5%D0%B4%D0%BE%D0%BF%D1%80%D0%B5%D0%B4%D0%B5%D0%BB%D0%B5%D0%BD%D0%BD%D1%8B%D0%B5_%D0%BC%D0%B0%D0%BA%D1%80%D0%BE%D1%81%D1%8B#C%D0%BF%D0%B8%D1%81%D0%BE%D0%BA_%D0%BC%D0%B0%D0%BA%D1%80%D0%BE%D1%81%D0%BE%D0%B2), описывающие место установки данных. Все исходные файлы размещаются в каталоге `RPM/SOURCE`. Явно к объекту, указанному в директиве `Source` (или `Source0`) можно обращаться через макрос `%SOURCE0`, `Source1:` — `%SOURCE1` и т. д.
+В основной части добавилась директива `%install`, которая отвечает за команды установки/копирования файлов из сборочного каталога в псевдо-корневой каталог. Утилита `install` занимается размещением всех файлов, которые должны входить в пакет (исполняемых файлов, документации, библиотек; в нашем случае — исполняемого скрипта), по их конечным директориям, при этом используются [предопределённые макросы](https://docs.altlinux.org/ru-RU/alt-platform/10.1/html-single/alt-platform/#rpm_makrosy), описывающие место установки данных. Все исходные файлы размещаются в каталоге `RPM/SOURCE`. Явно к объекту, указанному в директиве `Source` (или `Source0`) можно обращаться через макрос `%SOURCE0`, `Source1:` — `%SOURCE1` и т. д.
 
 Для сборки пакета не нужен (в ALT — **запрещён**) root. Во время сборки файлы устанавливаются в псевдокорневой каталог (как правило, `/usr/src/tmp/_имя-пакета_-buildroot/`; он обозначается макросом `%buildroot`). Наш скрипт попадает в поддиректорию `/usr/bin`.
 
@@ -267,7 +267,7 @@ echo "This is not null pkg"
 
 `@builder`
 ```console
-[builder@localhost ~]$ rpmbuild -ba RPM/SPECS/not-null-pkg.spec >& log 
+[builder@localhost ~]$ rpmbuild -ba RPM/SPECS/not-null-pkg.spec >& log
 ```
 
 Лог сборки пакета:
@@ -288,28 +288,28 @@ Executing(%install): /bin/sh -e /usr/src/tmp/rpm-tmp.81856
 * Проверка, соответствуют ли файлы пакета Build ALT Policy (дисциплине сборки пакетов ALT):
 ```
 + /usr/lib/rpm/brp-alt
-Cleaning files in /usr/src/tmp/not-null-pkg-buildroot (auto)  
-Verifying and fixing files in /usr/src/tmp/not-null-pkg-buildroot (binconfig,pkgconfig,libtool,desktop,gnuconfig)  
-Checking contents of files in /usr/src/tmp/not-null-pkg-buildroot/ (default)  
-Compressing files in /usr/src/tmp/not-null-pkg-buildroot (auto)  
-Verifying ELF objects in /usr/src/tmp/not-null-pkg-buildroot (arch=normal,fhs=normal,lfs=relaxed,lint=relaxed,rpath=normal,stack=normal,textrel=normal,unresolved=normal)  
-Splitting links to aliased files under /{,s}bin in /usr/src/tmp/not-null-pkg-buildroot  
+Cleaning files in /usr/src/tmp/not-null-pkg-buildroot (auto)
+Verifying and fixing files in /usr/src/tmp/not-null-pkg-buildroot (binconfig,pkgconfig,libtool,desktop,gnuconfig)
+Checking contents of files in /usr/src/tmp/not-null-pkg-buildroot/ (default)
+Compressing files in /usr/src/tmp/not-null-pkg-buildroot (auto)
+Verifying ELF objects in /usr/src/tmp/not-null-pkg-buildroot (arch=normal,fhs=normal,lfs=relaxed,lint=relaxed,rpath=normal,stack=normal,textrel=normal,unresolved=normal)
+Splitting links to aliased files under /{,s}bin in /usr/src/tmp/not-null-pkg-buildroot
 ```
 * Определение эксплуатационых зависимостей пакета, а также _предоставляемых_ им зависимостей и возможных отладочных компонентов:
 ```
-Processing files: not-null-pkg-1.0-alt1  
-Finding Provides (using /usr/lib/rpm/find-provides)  
-Executing: /bin/sh -e /usr/src/tmp/rpm-tmp.QrK1pE  
-find-provides: running scripts (alternatives,debuginfo,lib,pam,perl,pkgconfig,python,python3,shell)  
-Finding Requires (using /usr/lib/rpm/find-requires)  
-Executing: /bin/sh -e /usr/src/tmp/rpm-tmp.aiR5Fd  
-find-requires: running scripts (cpp,debuginfo,files,lib,pam,perl,pkgconfig,pkgconfiglib,python,python3,  
-rpmlib,shebang,shell,static,symlinks,systemd-services)  
-Finding debuginfo files (using /usr/lib/rpm/find-debuginfo-files)  
+Processing files: not-null-pkg-1.0-alt1
+Finding Provides (using /usr/lib/rpm/find-provides)
+Executing: /bin/sh -e /usr/src/tmp/rpm-tmp.QrK1pE
+find-provides: running scripts (alternatives,debuginfo,lib,pam,perl,pkgconfig,python,python3,shell)
+Finding Requires (using /usr/lib/rpm/find-requires)
+Executing: /bin/sh -e /usr/src/tmp/rpm-tmp.aiR5Fd
+find-requires: running scripts (cpp,debuginfo,files,lib,pam,perl,pkgconfig,pkgconfiglib,python,python3,
+rpmlib,shebang,shell,static,symlinks,systemd-services)
+Finding debuginfo files (using /usr/lib/rpm/find-debuginfo-files)
 ```
 * Сборка `.prm` и `.src.rpm`:
 ```
-Executing: /bin/sh -e /usr/src/tmp/rpm-tmp.CsoTgW  
+Executing: /bin/sh -e /usr/src/tmp/rpm-tmp.CsoTgW
 
 Wrote: /usr/src/RPM/SRPMS/not-null-pkg-1.0-alt1.src.rpm (w2.lzdio)
 Wrote: /usr/src/RPM/RPMS/x86_64/not-null-pkg-1.0-alt1.x86_64.rpm (w2.lzdio)
@@ -340,24 +340,24 @@ RPM/
 После сборки пакета в `/tmp` некоторое время хранятся данные со сборки:
 
 ```
-[builder@localhost ~]$ tree -A tmp  
-tmp  
-└── not-null-pkg-buildroot  
-   └── usr  
-       └── bin  
-           └── not-null-pkg  
-  
-4 directories, 1 file  
+[builder@localhost ~]$ tree -A tmp
+tmp
+└── not-null-pkg-buildroot
+   └── usr
+       └── bin
+           └── not-null-pkg
+
+4 directories, 1 file
 
 ```
 
-В данных двоичного пакета размещаются описание составляющих его файлов, а также зависимости пакета: 
+В данных двоичного пакета размещаются описание составляющих его файлов, а также зависимости пакета:
 
 ```console
-[builder@localhost ~]$ rpmquery --list --package RPM/RPMS/x86_64/not-null-pkg-1.0-alt1.x86_64.rpm  
-/usr/bin/not-null-pkg  
-[builder@localhost ~]$ rpmquery --requires --package RPM/RPMS/x86_64/not-null-pkg-1.0-alt1.x86_64.rpm  
-rpmlib(PayloadIsLzma)     
+[builder@localhost ~]$ rpmquery --list --package RPM/RPMS/x86_64/not-null-pkg-1.0-alt1.x86_64.rpm
+/usr/bin/not-null-pkg
+[builder@localhost ~]$ rpmquery --requires --package RPM/RPMS/x86_64/not-null-pkg-1.0-alt1.x86_64.rpm
+rpmlib(PayloadIsLzma)   
 [builder@localhost ~]$
 ```
 
@@ -365,7 +365,7 @@ rpmlib(PayloadIsLzma)   
 
 `@user`
 ```console
-[user@VM ~]$ hsh-shell --rooter  
+[user@VM ~]$ hsh-shell --rooter
 ```
 
 `@rooter`
@@ -373,7 +373,7 @@ rpmlib(PayloadIsLzma)   
 [root@localhost .in]# rpm -i /usr/src/RPM/RPMS/x86_64/not-null-pkg-1.0-alt1.x86_64.rpm  
 <13>Jul  1 16:33:50 rpm: not-null-pkg-1.0-alt1 1751387597 installed
 [root@localhost .in]# which not-null-pkg
-/usr/bin/not-null-pkg 
+/usr/bin/not-null-pkg
 [root@localhost .in]# /usr/bin/not-null-pkg  
 This is not null pkg
 [root@localhost .in]# not-null-pkg  
