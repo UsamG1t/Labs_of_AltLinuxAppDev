@@ -37,7 +37,7 @@ done
 test -d "$WORKDIR/chroot" || hsh --workdir="$WORKDIR" --mountpoints=$MOUNTPOINTS $ALLFLAGS --init
 if [ "$#" = 1 ]; then
   hsh-rebuild --workdir="$WORKDIR" $ALLFLAGS --install-only "$1"
-  hsh-run --workdir="$WORKDIR" $ALLFLAGS rpm -i /usr/src/in/srpm/`basename "$1"`
+  hsh-run --workdir="$WORKDIR" $ALLFLAGS -- rpm -i /usr/src/in/srpm/`basename "$1"`
 fi
 
 hsh-copy $ALLFLAGS --workdir="$WORKDIR" --rooter /etc/resolv.conf /etc/resolv.conf
