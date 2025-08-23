@@ -112,7 +112,7 @@ Release: alt1
 
 Summary: Null package
 
-License: GPLv3+
+License: GPL-3.0-or-later
 Group: Development/Other
 
 
@@ -230,7 +230,7 @@ Release: alt1
 
 Summary: Not Null package
 
-License: GPLv3+
+License: GPL-3.0-or-later
 Group: Development/Other
 
 Source: %name-%version.sh
