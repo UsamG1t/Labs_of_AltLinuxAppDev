@@ -239,7 +239,7 @@ Source: %name-%version.sh
 This is not the smallest ever alt package cause of functionality
 
 %install
-install -D 755 %SOURCE0 %buildroot%_bindir/%name
+install -D -pm 755 %SOURCE0 %buildroot%_bindir/%name
 
 %files
 %_bindir/*
@@ -249,7 +249,7 @@ install -D 755 %SOURCE0 %buildroot%_bindir/%name
 - Initial build
 ```
 
-`@builder`: `RPM/SOURCE/not-null-pkg-1.0.sh`
+`@builder`: `RPM/SOURCES/not-null-pkg-1.0.sh`
 
 ```console
 echo "This is not null pkg"
