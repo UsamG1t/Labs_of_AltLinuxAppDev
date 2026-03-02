@@ -6,5 +6,6 @@
 
 Основные ссылки на информационные ресурсы
 ---
-1. Ссылка на актуальный [курс](https://uneex.org/LecturesCMC/LinuxApplicationDevelopment2024)
+1. Ссылка на актуальный [курс](https://uneex.org/LecturesCMC/LinuxApplicationDevelopment2025)
 2. Ссылка на [методическое пособие](https://github.com/UsamG1t/Methodics_of_LinuxAppDev)
+3. Материал в формате [практико-ориентированной документации](https://docs.altlinux.org/ru-RU/platform/10.1/html/alt-platform-practic/index.html) компании «Базальт СПО»
